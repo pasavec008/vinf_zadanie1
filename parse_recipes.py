@@ -14,26 +14,28 @@ def set_title(decoded_line):
     }
     return recipe_dict, mode, checks, done
 
-def get_ingredients_from_plainlist(wl, source_file, recipe_dict):
+def get_ingredients_from_plainlist(wl, source_file, recipe_dict, blacklist):
     for line in source_file:
         decoded_line = line.decode('utf-8')
         if not re.search('\*', decoded_line):
             return
-        [recipe_dict['ingredients'].append(wl.lemmatize(ingredient).lower()) for ingredient in re.findall("(?!{})\\b\w+[\w\-']+\w", decoded_line)]
+        [recipe_dict['ingredients'].append(wl.lemmatize(ingredient).lower()) for ingredient in re.findall("(?!{})\\b\w+[\w\-']+\w".format(blacklist), decoded_line.lower())]
 
 def is_recipe(wl, source_file, decoded_line, checks, recipe_dict, recipes):
-    blacklist = 'main_ingredient|with|usually|the|added|and|other'
+    blacklist = 'main_ingredient|with|usually|the|added|and|other|often|cooking|white|black|food|brewed'
     if re.search('User', recipe_dict['title']):
         return 0
     if re.search('main_ingredient', decoded_line):
-        recipe_dict['ingredients'] = list(dict.fromkeys([wl.lemmatize(ingredient).lower() for ingredient in re.findall("(?!{})\\b\w+[\w\-']+\w".format(blacklist), decoded_line)]))
+        recipe_dict['ingredients'] = list(dict.fromkeys([wl.lemmatize(ingredient).lower() for ingredient in re.findall("(?!{})\\b\w+[\w\-']+\w".format(blacklist), decoded_line.lower())]))
         
         #recipe without ingredients
         if(not recipe_dict['ingredients']):
             return 0
         if(recipe_dict['ingredients'][0].lower() == 'plainlist'):
             recipe_dict['ingredients'].pop(0)
-            get_ingredients_from_plainlist(wl, source_file, recipe_dict)
+            get_ingredients_from_plainlist(wl, source_file, recipe_dict, blacklist)
+        #delete duplicates
+        recipe_dict['ingredients'] = list(dict.fromkeys(recipe_dict['ingredients']))
         recipe_dict['ingredients'].sort()
         checks[0] = 1
     if re.search('salt', decoded_line):

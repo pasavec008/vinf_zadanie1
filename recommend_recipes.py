@@ -7,7 +7,7 @@ def recommend_recipes(recipes):
         wanted_ingredients[i] = wl.lemmatize(ingredient).lower()
     wanted_ingredients.sort()
 
-    print(wanted_ingredients)
+    #print(wanted_ingredients)
 
     print('\n')
 
@@ -20,8 +20,9 @@ def recommend_recipes(recipes):
     #sort by most matches
     recipes_score_index.sort(reverse=True)
 
-    #print top 3
+    #print top recipes
     how_many_top = 3 if len(recipes_score_index) > 3 else len(recipes_score_index)
+    print('Your {} recommended recipes:\n'.format(how_many_top))
     for i in range(how_many_top):
         print('Recipe name: ', recipes[recipes_score_index[i][2]]['title'])
         print('Ingredients: ', recipes[recipes_score_index[i][2]]['ingredients'])
