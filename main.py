@@ -1,8 +1,17 @@
 import bz2
+import nltk
+nltk.download('wordnet')
+nltk.download('omw-1.4')
 from parse_recipes import parse_recipes
+from recommend_recipes import recommend_recipes
 
 def main():
-    source_file = bz2.BZ2File('2.bz2', 'r')
-    recipe_dict = parse_recipes(source_file)
+    #source_file = bz2.BZ2File('1.bz2', 'r')
+    #recipes = parse_recipes(source_file)
+    recipes = eval('''[{'title': 'Bubble tea', 'ingredients': ['brewed', 'creamer', 'flavoring', 'milk', 'non-dairy', 'sugar', 'tapioca', 'tea']}, {'title': 'Bubble and squeak', 'ingredients': ['cabbage', 'potato']}, {'title': 'Caesar salad', 'ingredients': ['anchovy', 'black', 'cheese', 'crouton', 'dijon', 'egg', 'food', 'juice', 'lemon', 'lettuce', 'mustard', 'oil', 'olive', 'parmesan', 'parmigiano-reggiano', 'pepper', 'romaine', 'sauce', 'worcestershire']}, {'title': 'Chocolate', 'ingredients': ['butter', 'chocolate', 'cocoa', 'for', 'liquor', 'often', 'sugar', 'white']}, {'title': 'Espagnole sauce', 'ingredients': ['paste', 'reduce', 'roux', 'tomato']}, {'title': 'French fries', 'ingredients': ['cooking', 'oil', 'oil', 'potato', 'salt']}, {'title': 'Gazpacho', 'ingredients': ['cucumber', 'garlic', 'oil', 'olive', 'other', 'tomato', 'vegetable', 'vinegar', 'water']}, {'title': 'Gerdur Gymisdottir', 'ingredients': ['corn', 'ground']}, {'title': 'Ham', 'ingredients': ['cured', 'curing', 'cut', 'food', 'leg', 'pork', 'preservation']}, {'title': 'Haggis', 'ingredients': ['casing', 'heart', 'liver', 'lung', 'oatmeal', 'offal', 'onion', 'sausage', "sheep's", 'spice', 'stomach', 'suet']}, {'title': 'Maple syrup', 'ingredients': ['black', 'from', 'maple', 'red', 'sap', 'sugar', 'xylem']}, {'title': 'Minestrone', 'ingredients': ['bean', 'carrot', 'celery', 'food', 'often', 'onion', 'pasta', 'rice', 'stock', 'tomato', 'vegetable', 'water']}, {'title': 'Miso', 'ingredients': ['aspergillus', 'fermentation', 'fermented', 'food', 'kōji', 'oryzae', 'salt', 'soybean']}, {'title': 'Pasta', 'ingredients': ['durum', 'flour', 'wheat']}, {'title': 'Pizza', 'ingredients': ['cheese', 'dough', 'sauce', 'tomato']}, {'title': 'Rosół', 'ingredients': ['broth', 'chicken', 'noodle']}, {'title': 'Submarine sandwich', 'ingredients': ['multiple']}, {'title': 'Sushi', 'ingredients': ['nori', 'rice', 'vinegared']}, {'title': 'Spam (food)', 'ingredients': ['pig']}, {'title': 'Zuppa alla modenese', 'ingredients': ['butter', 'cheese', 'crouton', 'egg', 'food', 'nutmeg', 'parmesan', 'salt', 'soup', 'spinach', 'stock']}, {'title': 'Soup alla Canavese', 'ingredients': ['bacon', 'black', 'butter', 'carrot', 'cauliflower', 'celery', 'cheese', 'chloride', 'common', 'fat', 'onion', 'parmesan', 'parsley', 'pepper', 'puree', 'sage', 'salt', 'sodium', 'soup', 'stock', 'tomato', 'white']}, {'title': 'Spaghetti', 'ingredients': ['flour', 'semolina', 'water']}, {'title': 'Taco', 'ingredients': ['animal', 'protein', 'tortilla', 'vegetable']}, {'title': 'Tomato sauce', 'ingredients': ['tomato']}, {'title': 'Tapas', 'ingredients': ['various']}, {'title': 'Worcestershire sauce', 'ingredients': ['anchovies', 'anchovy', 'flavoring', 'flavouring', 'food', 'garlic', 'grains', 'hlist', 'malt', 'molasses', 'onion', 'salt', 'spice', 'spirit', 'spirits', 'sugar', 'tamarind', 'vinegar']}, {'title': 'Year in Review 1st Century', 'ingredients': ['extract', 'yeast']}, {'title': 'Bread', 'ingredients': ['flour', 'water']}, {'title': 'Ramen', 'ingredients': ['alkaline', 'broth', 'chinese', 'chinese-style', 'fish-based', 'meat', 'noodle', 'vegetable', 'wheat']}]''')
+
+
+    recommend_recipes(recipes)
+
 
 main()

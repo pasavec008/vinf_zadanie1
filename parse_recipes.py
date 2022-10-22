@@ -1,4 +1,5 @@
 import re
+from nltk.stem import WordNetLemmatizer
 
 MAX_NUMBER_OF_LINES = 10000000
 
@@ -13,13 +14,29 @@ def set_title(decoded_line):
     }
     return recipe_dict, mode, checks, done
 
-def is_recipe(decoded_line, checks, recipe_dict, recipes):
-    if 'User' in recipe_dict['title']:
+def get_ingredients_from_plainlist(wl, source_file, recipe_dict):
+    for line in source_file:
+        decoded_line = line.decode('utf-8')
+        if not re.search('\*', decoded_line):
+            return
+        [recipe_dict['ingredients'].append(wl.lemmatize(ingredient).lower()) for ingredient in re.findall("(?!{})\\b\w+[\w\-']+\w", decoded_line)]
+
+def is_recipe(wl, source_file, decoded_line, checks, recipe_dict, recipes):
+    blacklist = 'main_ingredient|with|usually|the|added|and|other'
+    if re.search('User', recipe_dict['title']):
         return 0
-    if 'main_ingredient' in decoded_line:
-        recipe_dict['ingredients'] = list(dict.fromkeys([ingredient.lower() for ingredient in re.findall("(?!main_ingredient)\\b\w+[\w -']+\w", decoded_line)]))
+    if re.search('main_ingredient', decoded_line):
+        recipe_dict['ingredients'] = list(dict.fromkeys([wl.lemmatize(ingredient).lower() for ingredient in re.findall("(?!{})\\b\w+[\w\-']+\w".format(blacklist), decoded_line)]))
+        
+        #recipe without ingredients
+        if(not recipe_dict['ingredients']):
+            return 0
+        if(recipe_dict['ingredients'][0].lower() == 'plainlist'):
+            recipe_dict['ingredients'].pop(0)
+            get_ingredients_from_plainlist(wl, source_file, recipe_dict)
+        recipe_dict['ingredients'].sort()
         checks[0] = 1
-    if 'salt' in decoded_line:
+    if re.search('salt', decoded_line):
         checks[1] = 1
     if not 0 in checks:
         print(recipe_dict)
@@ -30,25 +47,27 @@ def is_recipe(decoded_line, checks, recipe_dict, recipes):
 def parse_recipes(source_file):
     recipes = []
     mode = 0
-    for index, line in enumerate(source_file):
+    wl = WordNetLemmatizer()
+    for line in source_file:
         decoded_line = line.decode('utf-8')
-
         #finding title
-        if mode == 0 and '<title>' in decoded_line:
+        if mode == 0 and re.search('<title>', decoded_line):
             recipe_dict, mode, checks, done = set_title(decoded_line)
             continue
         
         #finding text start
-        if mode == 1 and '<text' in decoded_line :
+        if mode == 1 and re.search('<text', decoded_line):
             mode = 2
             continue
 
         #finding end of text or printing
         if mode == 2:
-            if '</text>' in decoded_line:
+            if re.search('</text>', decoded_line):
                 mode = 0
             elif not done:
-                done = is_recipe(decoded_line, checks, recipe_dict, recipes)
+                done = is_recipe(wl, source_file, decoded_line, checks, recipe_dict, recipes)
 
         # if index > MAX_NUMBER_OF_LINES:
         #     return
+    print(recipes)
+    return recipes
