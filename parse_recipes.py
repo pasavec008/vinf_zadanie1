@@ -22,8 +22,9 @@ def get_ingredients_from_plainlist(wl, source_file, recipe_dict, blacklist):
         [recipe_dict['ingredients'].append(wl.lemmatize(ingredient).lower()) for ingredient in re.findall("(?!{})\\b\w+[\w\-']+\w".format(blacklist), decoded_line.lower())]
 
 def is_recipe(wl, source_file, decoded_line, checks, recipe_dict, recipes):
-    blacklist = 'main_ingredient|with|usually|the|added|and|other|often|cooking|white|black|food|brewed'
-    if re.search('User', recipe_dict['title']):
+    blacklist = 'main_ingredient|with|usually|the|added|and|other|often|cooking|white|black|food|brewed|also|lot'
+    title_blacklist = 'user|talk|[1-9]'
+    if re.search(title_blacklist, recipe_dict['title'].lower()):
         return 0
     if re.search('main_ingredient', decoded_line):
         recipe_dict['ingredients'] = list(dict.fromkeys([wl.lemmatize(ingredient).lower() for ingredient in re.findall("(?!{})\\b\w+[\w\-']+\w".format(blacklist), decoded_line.lower())]))
@@ -72,4 +73,5 @@ def parse_recipes(source_file):
         # if index > MAX_NUMBER_OF_LINES:
         #     return
     print(recipes)
+    print('We parsed ' + str(len(recipes)) + 'recipes')
     return recipes
