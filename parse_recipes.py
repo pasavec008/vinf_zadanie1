@@ -71,7 +71,7 @@ def parse_recipes(source_file):
 
     print(str(len(recipes)) + ' recipes loaded successfully from raw wiki data.')
 
-    with open('parsed_recipes.txt', 'w') as parsed_recipes:
+    with open('parsed_recipes.json', 'w') as parsed_recipes:
         parsed_recipes.write(json.dumps(recipes))
 
     return recipes

@@ -1,6 +1,7 @@
 import bz2
 import json
 import nltk
+from time import time
 nltk.download('wordnet')
 nltk.download('omw-1.4')
 from parse_recipes import parse_recipes
@@ -23,8 +24,10 @@ def main():
         user_input = input('Enter letter: ').lower()
 
         if user_input == 'r':
+            start = time()
             source_file = bz2.BZ2File(WIKI_FILE, 'r')
             recipes = parse_recipes(source_file)
+            print("Parsing recipes from raw wiki data completed in time: ", round(time() - start, 2), ' seconds.')
 
         elif user_input == 'f':
             parsed_recipes = open('parsed_recipes.json')

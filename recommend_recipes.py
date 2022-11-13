@@ -19,7 +19,7 @@ def recommend_recipes(recipes):
         recipes_score_index.sort(reverse=True)
 
         #print top recipes
-        how_many_top = 5 if len(recipes_score_index) >= 5 else len(recipes_score_index)
+        how_many_top = 3 if len(recipes_score_index) >= 3 else len(recipes_score_index)
         print('Your {} recommended recipes:\n'.format(how_many_top))
         for i in range(how_many_top):
             print('Recipe name: ', recipes[recipes_score_index[i][2]]['title'])
