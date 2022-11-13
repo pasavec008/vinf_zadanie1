@@ -1,7 +1,6 @@
 import re
+import json
 from nltk.stem import WordNetLemmatizer
-
-MAX_NUMBER_OF_LINES = 10000000
 
 def set_title(decoded_line):
     title = re.search('(?<=<title>).*(?=</title>)', decoded_line).group(0)
@@ -22,8 +21,8 @@ def get_ingredients_from_plainlist(wl, source_file, recipe_dict, blacklist):
         [recipe_dict['ingredients'].append(wl.lemmatize(ingredient).lower()) for ingredient in re.findall("(?!{})\\b\w+[\w\-']+\w".format(blacklist), decoded_line.lower())]
 
 def is_recipe(wl, source_file, decoded_line, checks, recipe_dict, recipes):
-    blacklist = 'main_ingredient|with|usually|the|added|and|other|often|cooking|white|black|food|brewed|also|lot'
-    title_blacklist = 'user|talk|[1-9]'
+    blacklist = 'main_ingredient|with|usually|the|added|and|other|often|cooking|white|black|food|brewed|also|lot|typically|occasionally|http|www|title|[0-9]'
+    title_blacklist = 'user|talk|[0-9]'
     if re.search(title_blacklist, recipe_dict['title'].lower()):
         return 0
     if re.search('main_ingredient', decoded_line):
@@ -70,8 +69,9 @@ def parse_recipes(source_file):
             elif not done:
                 done = is_recipe(wl, source_file, decoded_line, checks, recipe_dict, recipes)
 
-        # if index > MAX_NUMBER_OF_LINES:
-        #     return
-    print(recipes)
-    print('We parsed ' + str(len(recipes)) + 'recipes')
+    print(str(len(recipes)) + ' recipes loaded successfully from raw wiki data.')
+
+    with open('parsed_recipes.txt', 'w') as parsed_recipes:
+        parsed_recipes.write(json.dumps(recipes))
+
     return recipes
