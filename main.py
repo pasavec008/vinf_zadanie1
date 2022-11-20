@@ -1,13 +1,10 @@
-import bz2
 import json
 import nltk
 from time import time
-nltk.download('wordnet')
-nltk.download('omw-1.4')
 from parse_recipes import parse_recipes
 from recommend_recipes import recommend_recipes
 
-WIKI_FILE = '3_big.bz2'
+WIKI_FILE_NAME = '1.bz2'
 
 def welcome():
     print('''\n\n\n
@@ -18,6 +15,9 @@ s -> start recipe recommending
 x -> exit application\n''')
 
 def main():
+    nltk.download('wordnet')
+    nltk.download('omw-1.4')
+
     recipes = None
     welcome()
     while (True):
@@ -25,8 +25,7 @@ def main():
 
         if user_input == 'r':
             start = time()
-            source_file = bz2.BZ2File(WIKI_FILE, 'r')
-            recipes = parse_recipes(source_file)
+            recipes = parse_recipes(WIKI_FILE_NAME)
             print("Parsing recipes from raw wiki data completed in time: ", round(time() - start, 2), ' seconds.')
 
         elif user_input == 'f':
@@ -49,4 +48,5 @@ def main():
             print('Unknown option!\n')
             continue
 
-main()
+if __name__ == '__main__':
+    main()
