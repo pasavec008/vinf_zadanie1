@@ -12,7 +12,8 @@ Welcome to our recipe recommendation application. Enter one of these letters for
 r -> read and parse recipes from raw wiki data (this can take a while)
 f -> read already parsed recipes from .json file
 s -> start recipe recommending
-x -> exit application\n''')
+x -> exit application
+w -> save parsed data to json file\n''')
 
 def main():
     nltk.download('wordnet')
@@ -40,6 +41,14 @@ def main():
             else:
                 recommend_recipes(recipes)
                 welcome()
+
+        elif user_input == 'w':
+            if recipes == None:
+                print('Firstly, you need to read data! (with option "r" or "f")\n')
+                continue
+            with open('parsed_recipes.json', 'w') as parsed_recipes:
+                parsed_recipes.write(json.dumps(recipes))
+                print(str(len(recipes)) + ' recipes saved successfully to json.\n')
 
         elif user_input == 'x':
             return

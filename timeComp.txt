@@ -1,0 +1,2 @@
+99.17 seconds => linear
+89.13 seconds => parallel

@@ -1,10 +1,7 @@
 import re
-import json
 import bz2
-import multiprocessing as mp
+from multiprocessing import Process, Queue, Value
 from nltk.stem import WordNetLemmatizer
-
-from time import time
 
 def set_title(decoded_line):
     title = re.search('(?<=<title>).*(?=</title>)', decoded_line).group(0)
@@ -56,15 +53,14 @@ def is_recipe(raw_recipe_dict, wl):
             return raw_recipe_dict
     return 0
 
-def parse_selected_recipes(recipes_to_parse, parsed_recipes, raw_read_done):
-    print('p2 parse')
+def parse_selected_recipes(recipes_to_parse, parsed_recipes_queue, raw_read_done):
     wl = WordNetLemmatizer()
-    while not raw_read_done[0]:
-        while recipes_to_parse:
-            print('p2 ', recipes_to_parse)
-            parsed_maybe_recipe = is_recipe(recipes_to_parse.pop(), wl)
-            if parsed_maybe_recipe:
-                parsed_recipes.append(parsed_maybe_recipe)
+    while not raw_read_done.value:
+        parsed_maybe_recipe = is_recipe(recipes_to_parse.get(), wl)
+        if parsed_maybe_recipe:
+            parsed_recipes_queue.put(parsed_maybe_recipe)
+    #print('done')
+    parsed_recipes_queue.put(0)
     return
 
 def read_raw(wiki_file_name, recipes_to_parse, raw_read_done):
@@ -86,51 +82,31 @@ def read_raw(wiki_file_name, recipes_to_parse, raw_read_done):
         if mode == 2:
             if re.search('</text>', decoded_line):
                 mode = 0
-                recipes_to_parse.append(recipe_dict_raw)
-                print('p1 ', recipes_to_parse)
+                recipes_to_parse.put(recipe_dict_raw)
             else:
                 recipe_dict_raw['raw_text'] += decoded_line
-                #done = is_recipe(wl, source_file, decoded_line, checks, recipe_dict, recipes)
-    
-    raw_read_done[0] = True
-
-    # print(str(len(recipes)) + ' recipes loaded successfully from raw wiki data.')
-
-    # with open('parsed_recipes.json', 'w') as parsed_recipes:
-    #     parsed_recipes.write(json.dumps(recipes))
+    raw_read_done.value = 1
 
 def parse_recipes(wiki_file_name):
-    # TODO: we need shared array recipes_to_parse and raw_read_done
-    #mp.set_start_method('spawn')
-    recipes_to_parse = []
+    #create queues for shared "arrays"
+    recipes_to_parse = Queue()
+    parsed_recipes_queue = Queue()
     parsed_recipes = []
-    raw_read_done = [False]
-    # start = time()
-    # read_raw(source_file, recipes_to_parse)
-    # parse_selected_recipes(recipes_to_parse, parsed_recipes)
-    # print("Linear time: ", round(time() - start, 2), ' seconds.')
-    # return parsed_recipes
+    raw_read_done = Value('i', 0)
 
-    start = time()
-    # creating process
-    p1 = mp.Process(target = read_raw, args=(wiki_file_name, recipes_to_parse, raw_read_done))
-    p2 = mp.Process(target = parse_selected_recipes, args=(recipes_to_parse, parsed_recipes, raw_read_done))
+    # creating processes
+    p1 = Process(target = read_raw, args=(wiki_file_name, recipes_to_parse, raw_read_done))
+    p2 = Process(target = parse_selected_recipes, args=(recipes_to_parse, parsed_recipes_queue, raw_read_done))
  
-    print('ahoj')
-    # starting process 1
+    # starting processes
     p1.start()
-    # starting process 2
     p2.start()
-    print('cau')
  
-    # wait until process 1 is completely executed
-    p1.join()
-    print('nazdar')
-    # wait until process 2 is completely executed
-    p2.join()
+    #after this while, all processes should be completely executed
+    while 1:
+        new_recipe = parsed_recipes_queue.get()
+        if not new_recipe:
+            break
+        parsed_recipes.append(new_recipe)
  
-    print('Number of parsed: ', len(parsed_recipes))
-    # both processes completely executed
-    print("Parallel time: ", round(time() - start, 2), ' seconds.')
-
     return parsed_recipes
