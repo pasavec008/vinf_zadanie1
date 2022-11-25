@@ -4,7 +4,7 @@ from time import time
 from parse_recipes import parse_recipes
 from recommend_recipes import recommend_recipes
 
-WIKI_FILE_NAME = '1.bz2'
+WIKI_FILE_NAME = '3_big.bz2'
 
 def welcome():
     print('''\n\n\n

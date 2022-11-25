@@ -1,6 +1,6 @@
 import re
 import bz2
-from multiprocessing import Process, Queue, Value
+from multiprocessing import Process, Queue
 from nltk.stem import WordNetLemmatizer
 
 def set_title(decoded_line):
@@ -53,17 +53,26 @@ def is_recipe(raw_recipe_dict, wl):
             return raw_recipe_dict
     return 0
 
-def parse_selected_recipes(recipes_to_parse, parsed_recipes_queue, raw_read_done):
+def parse_selected_recipes(recipes_to_parse, parsed_recipes_queue):
+    #x = 0
+    #diff = 0
     wl = WordNetLemmatizer()
-    while not raw_read_done.value:
-        parsed_maybe_recipe = is_recipe(recipes_to_parse.get(), wl)
+    while 1:
+        read_recipe = recipes_to_parse.get()
+        diff += 1
+        if not read_recipe:
+            break
+        parsed_maybe_recipe = is_recipe(read_recipe, wl)
         if parsed_maybe_recipe:
             parsed_recipes_queue.put(parsed_maybe_recipe)
-    #print('done')
+            #x += 1
+            #print(x, diff)
+            #diff = 0
+    print('Done parse')
     parsed_recipes_queue.put(0)
     return
 
-def read_raw(wiki_file_name, recipes_to_parse, raw_read_done):
+def read_raw(wiki_file_name, recipes_to_parse):
     source_file = bz2.BZ2File(wiki_file_name, 'r')
     mode = 0
     for line in source_file:
@@ -85,18 +94,19 @@ def read_raw(wiki_file_name, recipes_to_parse, raw_read_done):
                 recipes_to_parse.put(recipe_dict_raw)
             else:
                 recipe_dict_raw['raw_text'] += decoded_line
-    raw_read_done.value = 1
+    
+    print('Done read')
+    recipes_to_parse.put(0)
 
 def parse_recipes(wiki_file_name):
     #create queues for shared "arrays"
     recipes_to_parse = Queue()
     parsed_recipes_queue = Queue()
     parsed_recipes = []
-    raw_read_done = Value('i', 0)
 
     # creating processes
-    p1 = Process(target = read_raw, args=(wiki_file_name, recipes_to_parse, raw_read_done))
-    p2 = Process(target = parse_selected_recipes, args=(recipes_to_parse, parsed_recipes_queue, raw_read_done))
+    p1 = Process(target = read_raw, args=(wiki_file_name, recipes_to_parse))
+    p2 = Process(target = parse_selected_recipes, args=(recipes_to_parse, parsed_recipes_queue))
  
     # starting processes
     p1.start()
