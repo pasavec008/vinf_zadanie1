@@ -68,45 +68,44 @@ def parse_selected_recipes(recipes_to_parse, parsed_recipes_queue):
     return
 
 def read_raw(wiki_file_name, recipes_to_parse):
-    #source_file = bz2.BZ2File(wiki_file_name, 'r')
+    source_file = bz2.BZ2File(wiki_file_name, 'r')
     mode = 0
     ingredients = 0
     plainlist = 0
-    salt = 0
-    with bz2.BZ2File(wiki_file_name) as source_file:
-        for line in source_file:
-            decoded_line = line.decode('utf-8')
-            #finding title
-            if mode == 0 and '<title>' in decoded_line:
-                recipe_dict_raw, mode = set_title(decoded_line)
-                continue
-            
-            #finding text start
-            elif mode == 1 and '<text' in decoded_line:
-                mode = 2
-                continue
+    salt_check = 0
+    for line in source_file:
+        decoded_line = line.decode('utf-8')
+        #finding title
+        if mode == 0 and '<title>' in decoded_line:
+            recipe_dict_raw, mode = set_title(decoded_line)
+            continue
+        
+        #finding text start
+        elif mode == 1 and '<text' in decoded_line:
+            mode = 2
+            continue
 
-            #finding end of text or printing
-            elif mode == 2:
-                if plainlist:
-                    if not '\*' in decoded_line:
-                        plainlist = 0
-                        recipe_dict_raw['raw_text'] += decoded_line
-                    else:
-                        recipe_dict_raw['raw_text'] += decoded_line
-                if 'salt' in decoded_line:
-                    salt = 1
-                elif 'main_ingredient' in decoded_line:
-                    if 'plainlist' in decoded_line.lower():
-                        plainlist = 1
-                    ingredients = 1
+        #finding end of text or printing
+        elif mode == 2:
+            if (not salt_check) and 'salt' in decoded_line:
+                salt_check = 1
+            if plainlist:
+                if not '*' in decoded_line:
+                    plainlist = 0
                     recipe_dict_raw['raw_text'] += decoded_line
-                elif '</text>' in decoded_line:
-                    if ingredients and salt:
-                        recipes_to_parse.put_nowait(recipe_dict_raw)
-                        ingredients = 0
-                    mode = 0
-                    salt = 0
+                else:
+                    recipe_dict_raw['raw_text'] += decoded_line
+            elif 'main_ingredient' in decoded_line:
+                if 'plainlist' in decoded_line.lower():
+                    plainlist = 1
+                ingredients = 1
+                recipe_dict_raw['raw_text'] += decoded_line
+            elif '</text>' in decoded_line:
+                if ingredients and salt_check:
+                    recipes_to_parse.put_nowait(recipe_dict_raw)
+                    ingredients = 0
+                mode = 0
+                salt_check = 0
             
     print('Done read')
     recipes_to_parse.put_nowait(0)
