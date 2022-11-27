@@ -41,7 +41,7 @@ def is_recipe(wl, source_file, decoded_line, checks, recipe_dict, recipes):
     if re.search('salt', decoded_line):
         checks[1] = 1
     if not 0 in checks:
-        print(recipe_dict)
+        #print(recipe_dict)
         recipes.append(recipe_dict)
         return 1
     return 0

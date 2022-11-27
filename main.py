@@ -7,7 +7,7 @@ nltk.download('omw-1.4')
 from parse_recipes import parse_recipes
 from recommend_recipes import recommend_recipes
 
-WIKI_FILE = '3_big.bz2'
+WIKI_FILE = '1.bz2'
 
 def welcome():
     print('''\n\n\n
