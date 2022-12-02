@@ -1,7 +1,8 @@
 version: "3.8"
 services:
-  spark:
-    image: "iisas/mesos-spark-wikiparser"
+  vinf_recipes:
+    build:
+      context: "./"
     # ports:
     #   - "50070:50070"
     #   - "8088:8088"
@@ -10,11 +11,13 @@ services:
     #   - "8081:8081"
     #   - "19888:19888"
     #we need these lines so container does not stop
-    # stdin_open: true # docker run -i
-    # tty: true        # docker run -t
-    command: >
-      bash -c "echo 'Starting spark container'
-      && tail -F anything"
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    # command: sh -c "echo "cau""
+    # command: >
+    #   bash -c "echo 'Starting spark container'
+    #   && hadoop fs -put /vinf_recipes/1
+    #   && tail -f /dev/null"
     volumes:
-      - ./:/vinf/
+      - ./:/vinf_recipes/
     #restart: always
