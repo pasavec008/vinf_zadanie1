@@ -3,13 +3,13 @@ services:
   vinf_recipes:
     build:
       context: "./"
-    # ports:
-    #   - "50070:50070"
-    #   - "8088:8088"
-    #   - "8080:8080"
-    #   - "8042:8042"
-    #   - "8081:8081"
-    #   - "19888:19888"
+    ports:
+      - "50070:50070"
+      - "8088:8088"
+      - "8080:8080"
+      - "8042:8042"
+      - "8081:8081"
+      - "19888:19888"
     #we need these lines so container does not stop
     stdin_open: true # docker run -i
     tty: true        # docker run -t
