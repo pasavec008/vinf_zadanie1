@@ -3,10 +3,12 @@ FROM iisas/hadoop-spark-pig-hive:2.9.2
 WORKDIR /vinf_recipes
 
 RUN apt-get update &&\
-    apt-get -y install python3-pip &&\
-    export PYSPARK_PYTHON=python3 &&\
-    export PYTHONIOENCODING=utf8 &&\
-    ln -sf /usr/bin/python3 /usr/bin/python &&\
+    apt-get -y install python3-pip
+
+ENV PYTHONIOENCODING=utf8
+ENV PYSPARK_PYTHON=python3
+
+RUN ln -sf /usr/bin/python3 /usr/bin/python &&\
     printf "export SPARK_DIST_CLASSPATH=\$(/usr/local/hadoop/bin/hadoop classpath)\n\
 export SPARK_WORKER_MEMORY=4096m\n\
 export SPARK_DAEMON_MEMORY=4096m\n\
