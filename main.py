@@ -1,6 +1,5 @@
 import json
 import nltk
-import re
 from time import time
 from parse_recipes import parsing_wiki
 from recommend_recipes import recommend_recipes
@@ -11,7 +10,7 @@ from recommend_recipes import recommend_recipes
 # s - start recipe recommending
 # w - save parsed data to json file
 # x - exit application
-USER_INPUT = ['r', 's', 'w', 'f', 's', 'x']
+USER_INPUT = ['f', 's', 'w', 'f', 's', 'x']
 
 # specify ingredients for recommending
 RECOMMENDING_USER_INPUT = ['oil', 'potato', 'salt']

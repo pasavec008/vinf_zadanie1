@@ -1,5 +1,4 @@
 import re
-from multiprocessing import Process, Queue
 from nltk.stem import WordNetLemmatizer
 
 #pyspark
