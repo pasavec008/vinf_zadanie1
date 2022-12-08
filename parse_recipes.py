@@ -56,7 +56,7 @@ def parse_one_row(wl, row, variables_dict, blacklist, title_blacklist):
             return
     return
 
-def parsing_wiki():
+def parsing_wiki(wiki_file):
     print('Start of parsing')
     # this creates spark cluster, first argument is url and second is name of app
     spark_context = SparkContext('local[*]', 'vinf_recipes')
@@ -71,7 +71,7 @@ def parsing_wiki():
     title_blacklist = 'user|talk|[0-9]'
 
     # this returns our file from hadoop as RDD of strings
-    rdd_of_strings = spark_context.textFile('./1')
+    rdd_of_strings = spark_context.textFile('./' + wiki_file)
     print('File loaded')
 
     # create dataframe with spark session
