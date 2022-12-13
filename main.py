@@ -5,6 +5,7 @@ from parse_recipes import parsing_wiki
 from recommend_recipes import recommend_recipes
 from indexing import create_inverted_index
 from indexing import search_in_inverted_index
+from testing import *
 
 # you can specify actions program should make
 # r - read and parse recipes from raw wiki data (this can take a while)
@@ -12,10 +13,16 @@ from indexing import search_in_inverted_index
 # s - start recipe recommending
 # w - save parsed data to json file
 # x - exit application
+# t - run tests
 # ci - create inverted index
 # si - search index
-#USER_INPUT = ['f', 's', 'w', 'f', 's', 'ci', 'si' 'x']
-USER_INPUT = ['r', 'ci', 'si', 'x']
+#USER_INPUT = ['f', 's', 'w', 'f', 's', 'ci', 'si', 'x']
+
+#example input for parsing
+USER_INPUT = ['r', 's', 'x']
+
+#example input for unit tests
+#USER_INPUT = ['t', 'x']
 
 # if you have specified 'is' in USER_INPUT, you also need INDEX_SEARCH_INPUT
 # which are ingredients and index search will find you all foods containing that ingredient
@@ -37,6 +44,7 @@ f -> read already parsed recipes from .json file
 s -> start recipe recommending
 x -> exit application
 w -> save parsed data to json file
+t -> run tests
 ci -> create inverted index
 si -> search index\n''')
 
@@ -83,6 +91,11 @@ def main():
             with open('parsed_recipes.json', 'w') as parsed_recipes:
                 parsed_recipes.write(json.dumps(recipes))
                 print(str(len(recipes)) + ' recipes saved successfully to json.\n')
+
+        elif letter == 't':
+            print('Running tests!')
+            unittest.main()
+            continue
         
         elif letter == 'ci':
             if recipes == None:

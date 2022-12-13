@@ -16,4 +16,4 @@ def search_in_inverted_index(recipes_index, index_search_input):
             print('Ingredient', index_input, 'is in these recipes:', recipes_index[index_input])
         else:
             print('We did not find ingredient', index_input, 'in any of our recipes.')
-    return
+    return True
