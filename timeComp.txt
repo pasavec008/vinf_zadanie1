@@ -1,2 +1,3 @@
-99.17 seconds => linear
-89.13 seconds => parallel
+15723 seconds => linear
+9317 seconds => parallel
+6992 seconds => pyspark + hadoop

@@ -16,20 +16,21 @@ from testing import *
 # t - run tests
 # ci - create inverted index
 # si - search index
-#USER_INPUT = ['f', 's', 'w', 'f', 's', 'ci', 'si', 'x']
+USER_INPUT = ['f', 'w', 'f', 's', 'ci', 'si', 'x']
 
 #example input for parsing
-USER_INPUT = ['r', 's', 'x']
+#USER_INPUT = ['r', 's', 'x']
 
 #example input for unit tests
 #USER_INPUT = ['t', 'x']
 
-# if you have specified 'is' in USER_INPUT, you also need INDEX_SEARCH_INPUT
-# which are ingredients and index search will find you all foods containing that ingredient
-INDEX_SEARCH_INPUT = ['salmon', 'caramel', 'nori']
-
 # specify ingredients for recommending
 RECOMMENDING_USER_INPUT = ['oil', 'potato', 'salt']
+
+# if you have specified 'is' in USER_INPUT, you also need INDEX_SEARCH_INPUT
+# which are ingredients and index search will find you all foods containing that ingredient
+INDEX_SEARCH_INPUT = ['salmon', 'caramel', 'potato']
+
 
 # name of file for parsing
 # you need to add this file to hadoop with command
