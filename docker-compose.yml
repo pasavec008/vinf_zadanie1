@@ -1,0 +1,11 @@
+version: "3.8"
+services:
+  vinf_recipes:
+    build:
+      context: "./"
+    #we need these lines so container does not stop
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    volumes:
+      - ./:/vinf_recipes/
+    #restart: always

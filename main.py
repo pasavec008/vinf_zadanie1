@@ -1,13 +1,41 @@
-import bz2
 import json
 import nltk
 from time import time
-nltk.download('wordnet')
-nltk.download('omw-1.4')
-from parse_recipes import parse_recipes
+from parse_recipes import parsing_wiki
 from recommend_recipes import recommend_recipes
+from indexing import create_inverted_index
+from indexing import search_in_inverted_index
+from testing import *
 
-WIKI_FILE = '1.bz2'
+# you can specify actions program should make
+# r - read and parse recipes from raw wiki data (this can take a while)
+# f - read already parsed recipes from .json file
+# s - start recipe recommending
+# w - save parsed data to json file
+# x - exit application
+# t - run tests
+# ci - create inverted index
+# si - search index
+USER_INPUT = ['f', 'w', 'f', 's', 'ci', 'si', 'x']
+
+#example input for parsing
+#USER_INPUT = ['r', 's', 'x']
+
+#example input for unit tests
+#USER_INPUT = ['t', 'x']
+
+# specify ingredients for recommending
+RECOMMENDING_USER_INPUT = ['oil', 'potato', 'salt']
+
+# if you have specified 'is' in USER_INPUT, you also need INDEX_SEARCH_INPUT
+# which are ingredients and index search will find you all foods containing that ingredient
+INDEX_SEARCH_INPUT = ['salmon', 'caramel', 'potato']
+
+
+# name of file for parsing
+# you need to add this file to hadoop with command
+# hadoop fs -put /vinf_recipes/1.bz2 /user/root
+WIKI_FILE_NAME = '1.bz2'
 
 def welcome():
     print('''\n\n\n
@@ -15,38 +43,82 @@ Welcome to our recipe recommendation application. Enter one of these letters for
 r -> read and parse recipes from raw wiki data (this can take a while)
 f -> read already parsed recipes from .json file
 s -> start recipe recommending
-x -> exit application\n''')
+x -> exit application
+w -> save parsed data to json file
+t -> run tests
+ci -> create inverted index
+si -> search index\n''')
+
 
 def main():
+    # we need to put file on hadoop first -> with this command in console:
+    # where 1 is name of file and second argument is location 
+    # hadoop fs -put /vinf_recipes/1.bz2 /user/root
+
+    # then start our program with
+    # spark-submit main.py
+
+    nltk.download('wordnet')
+    nltk.download('omw-1.4')
+
     recipes = None
+    indexed_recipes = None
     welcome()
-    while (True):
-        user_input = input('Enter letter: ').lower()
+    for letter in USER_INPUT:
+        print('User input', letter)
 
-        if user_input == 'r':
+        if letter == 'r':
             start = time()
-            source_file = bz2.BZ2File(WIKI_FILE, 'r')
-            recipes = parse_recipes(source_file)
+            recipes = parsing_wiki(WIKI_FILE_NAME)
             print("Parsing recipes from raw wiki data completed in time: ", round(time() - start, 2), ' seconds.')
+            print(str(len(recipes)) + ' recipes parsed successfully from raw wiki file.\n')
 
-        elif user_input == 'f':
+        elif letter == 'f':
             parsed_recipes = open('parsed_recipes.json')
             recipes = json.load(parsed_recipes)
             print(str(len(recipes)) + ' recipes loaded successfully from parsed json data.\n')
 
-        elif user_input == 's':
+        elif letter == 's':
             if recipes == None:
                 print('Firstly, you need to read data! (with option "r" or "f")\n')
                 continue
             else:
-                recommend_recipes(recipes)
-                welcome()
+                recommend_recipes(recipes, RECOMMENDING_USER_INPUT)
 
-        elif user_input == 'x':
+        elif letter == 'w':
+            if recipes == None:
+                print('Firstly, you need to read data! (with option "r" or "f")\n')
+                continue
+            with open('parsed_recipes.json', 'w') as parsed_recipes:
+                parsed_recipes.write(json.dumps(recipes))
+                print(str(len(recipes)) + ' recipes saved successfully to json.\n')
+
+        elif letter == 't':
+            print('Running tests!')
+            unittest.main()
+            continue
+        
+        elif letter == 'ci':
+            if recipes == None:
+                print('Firstly, you need to read data! (with option "r" or "f")\n')
+                continue
+            else:
+               indexed_recipes = create_inverted_index(recipes)
+               print('Recipes index created success')
+        
+        elif letter == 'si':
+            if indexed_recipes == None:
+                print('Firstly, you need create index! (with option "ci")\n')
+                continue
+            else:
+                search_in_inverted_index(indexed_recipes, INDEX_SEARCH_INPUT)
+
+        elif letter == 'x':
             return
 
         else:
             print('Unknown option!\n')
             continue
 
-main()
+if __name__ == '__main__':
+    main()
